@@ -114,6 +114,22 @@ docker run -p 5000:5000 devops-demo-app
 
 ---
 
+## 🔄 CI/CD Pipeline
+
+### Azure DevOps
+
+1. Criar projeto no Azure DevOps
+1. Conectar repositório GitHub
+1. Criar Service Connection com Azure
+1. Criar environments: staging e production
+1. Configurar pipeline apontando para azure-pipelines.yml
+
+> ⚠️ Importante: Para repositórios privados, solicite parallelism grant:
+> https://aka.ms/azpipelines-parallelism-request
+
+---
+
+
 ## 📝 Autor
 Gustavo Avila Gama
 DevOps Engineer | gamagustavo.com.br
