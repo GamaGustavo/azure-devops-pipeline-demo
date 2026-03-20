@@ -75,10 +75,44 @@ az ad sp create-for-rbac \
 
 > ⚠️ Salve as credenciais — você precisará delas para configurar os secrets do GitHub.
 
+---
 
+## 🛠️ Configuração Local
+### Clonar repositório
 
+```bash
+git clone https://github.com/seu-usuario/azure-devops-pipeline-demo.git
+cd azure-devops-pipeline-demo
+```
 
+### Instalar dependências
 
+```bash
+cd app
+pip install -r requirements.txt
+```
+
+### Executar localmente
+
+```bash
+python src/main.py
+```
+Acesse: http://localhost:5000
+
+### Executar testes
+
+```bash
+python -m pytest tests/ -v
+```
+
+### Build Docker
+
+```bash
+docker build -t devops-demo-app app/
+docker run -p 5000:5000 devops-demo-app
+```
+
+---
 
 ## 📝 Autor
 Gustavo Avila Gama
