@@ -1,0 +1,101 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  imageName: 'devops-demo-app'
+  containerRegistry: 'devopsdemoacr' 
+
+stages:
+- stage: Build
+  displayName: 'Build & Test'
+  jobs:
+  - job: BuildJob
+    displayName: 'Build Docker Image & Run Tests'
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.11'
+    
+    - script: |
+        pip install -r app/requirements.txt
+      displayName: 'Install dependencies'
+    
+    - script: |
+        python -m pytest app/tests/ -v
+      displayName: 'Run unit tests'
+    
+    - task: Docker@2
+      displayName: 'Build Docker image'
+      inputs:
+        command: 'build'
+        repository: '$(imageName)'
+        dockerfile: 'app/Dockerfile'
+        tags: |
+          $(Build.BuildId)
+          latest
+
+- stage: Deploy_Staging
+  displayName: 'Deploy to Staging'
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - deployment: DeployStaging
+    displayName: 'Deploy to Azure Container Instances (Staging)'
+    environment: 'staging'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: Docker@2
+            displayName: 'Push image to ACR'
+            inputs:
+              command: 'push'
+              repository: '$(containerRegistry)/$(imageName)'
+              tags: |
+                $(Build.BuildId)
+          
+          - task: AzureCLI@2
+            displayName: 'Deploy to ACI (Staging)'
+            inputs:
+              azureSubscription: 'Azure-Service-Connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az container create \
+                  --resource-group devops-demo-rg \
+                  --name devops-demo-staging \
+                  --image $(containerRegistry).azurecr.io/$(imageName):$(Build.BuildId) \
+                  --dns-name-label devops-demo-staging-$(Build.BuildId) \
+                  --ports 5000
+
+- stage: Deploy_Production
+  displayName: 'Deploy to Production'
+  dependsOn: Deploy_Staging
+  condition: succeeded()
+  jobs:
+  - deployment: DeployProduction
+    displayName: 'Deploy to Production (Manual Approval)'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureCLI@2
+            displayName: 'Deploy to ACI (Production)'
+            inputs:
+              azureSubscription: 'Azure-Service-Connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az container create \
+                  --resource-group devops-demo-rg \
+                  --name devops-demo-prod \
+                  --image $(containerRegistry).azurecr.io/$(imageName):$(Build.BuildId) \
+                  --dns-name-label devops-demo-prod \
+                  --ports 5000
