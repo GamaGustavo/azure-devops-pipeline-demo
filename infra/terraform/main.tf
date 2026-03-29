@@ -56,7 +56,7 @@ resource "azurerm_container_group" "demo_staging" {
     }
   }
 
-  registry_credential {
+  image_registry_credential {
     server   = azurerm_container_registry.demo_acr.login_server
     username = var.acr_username
     password = var.acr_password
@@ -89,7 +89,7 @@ resource "azurerm_container_group" "demo_production" {
     }
   }
 
-  registry_credential {
+  image_registry_credential {
     server   = azurerm_container_registry.demo_acr.login_server
     username = var.acr_username
     password = var.acr_password
