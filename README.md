@@ -127,8 +127,98 @@ docker run -p 5000:5000 devops-demo-app
 > ⚠️ Importante: Para repositórios privados, solicite parallelism grant:
 > https://aka.ms/azpipelines-parallelism-request
 
+### GitHub Actions
+
+Pipeline automático configurado em `.github/workflows/ci-cd.yml`:
+
+- **Stage 1**: Build & Test (Python + pytest)
+- **Stage 2**: Terraform Plan (validação de infra)
+- **Stage 3**: Deploy to Staging (automático)
+- **Stage 4**: Deploy to Production (requer aprovação manual)
+
+#### Configurar Secrets no GitHub
+
+1. Acesse: **Settings → Secrets and variables → Actions**
+2. Adicione os seguintes secrets:
+
+| Nome                 | Valor                                  |
+|----------------------|----------------------------------------|
+| AZURE_CLIENT_ID      | Client ID do Service Principal         |
+| AZURE_CLIENT_SECRET  | Client Secret do Service Principal     |
+| AZURE_SUBSCRIPTION_ID| ID da sua assinatura Azure             |
+| AZURE_TENANT_ID      | Tenant ID do Azure                     |
+| AZURE_CREDENTIALS    | JSON com todas as credenciais          |
+
+**Formato de `AZURE_CREDENTIALS`**:
+
+```json
+{
+  "clientId": "SEU_CLIENT_ID_AQUI",
+  "clientSecret": "SEU_CLIENT_SECRET_AQUI",
+  "subscriptionId": "sua_subscription_id",
+  "tenantId": "seu_tenant_id"
+}
+```
+
 ---
 
+## 🌐 Deploy com Terraform
+
+### Inicializar
+
+```bash
+terraform init
+```
+
+### Validar
+
+```bash
+terraform validate
+```
+
+### Planejar
+
+```bash
+terraform plan \
+  -var="location=brazilsouth" \
+  -var="acr_username=seu-client-id" \
+  -var="acr_password=seu-client-secret" \
+  -var="image_tag=latest"
+```
+
+### Aplicar
+
+```bash
+terraform apply \
+  -var="location=brazilsouth" \
+  -var="acr_username=seu-client-id" \
+  -var="acr_password=seu-client-secret" \
+  -var="image_tag=latest"
+```
+
+### Destruir (para evitar custos)
+
+```bash
+terraform destroy
+```
+---
+
+## 💰 Controle de Custos
+
+- **ACR Basic:** ~R$0,16/hora (~R$115/mês se 24/7)
+- **ACI:** ~R$0,01/hora por CPU (~R$7/mês por instância)
+
+**Recomendação:** Só crie recursos quando for testar. Delete após validação:
+
+```bash
+# Delete ACR
+az acr delete --name devopsdemoacr --resource-group devops-demo-rg --yes
+
+# Delete Resource Group (remove TUDO)
+az group delete --name devops-demo-rg --yes --no-wait
+```
+
+---
 
 ## 📝 Autor
 Gustavo Avila Gama
