@@ -1,4 +1,5 @@
 # Azure DevOps Pipeline Demo
+![CI/CD Pipeline](https://github.com/GamaGustavo/azure-devops-pipeline-demo/actions/workflows/ci-cd.yml/badge.svg)
 
 Projeto demonstrando uma pipeline CI/CD completa com Azure DevOps, GitHub Actions, Terraform e Docker.
 
