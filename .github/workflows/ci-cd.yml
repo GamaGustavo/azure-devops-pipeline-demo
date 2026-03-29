@@ -72,23 +72,17 @@ jobs:
         cd infra/terraform
         terraform validate
    
-    - name: Debug - Show environment variables (masked)
-      run: |
-        echo "Resource Group: ${{ env.AZURE_RESOURCE_GROUP }}"
-        echo "ACR: ${{ env.AZURE_CONTAINER_REGISTRY }}"
-        echo "Location: ${{ env.AZURE_LOCATION }}"
-        echo "Client ID (masked): ***${{ secrets.AZURE_CLIENT_ID }}"    
-    
-    - name: Terraform plan (debug mode)
+    - name: Terraform plan
       run: |
         cd infra/terraform
-        terraform plan -var="location=${{ env.AZURE_LOCATION }}" -var="acr_username=${{ secrets.AZURE_CLIENT_ID }}" -var="acr_password=${{ secrets.AZURE_CLIENT_SECRET }}" -var="image_tag=latest" -no-color
+        terraform init
+        terraform validate
+        terraform plan -var="acr_username=${{ secrets.AZURE_CLIENT_ID }}" -var="acr_password=${{ secrets.AZURE_CLIENT_SECRET }}"
       env:
         ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        timeout-minutes: 5
 
   deploy-staging:
     name: Deploy to Staging
