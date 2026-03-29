@@ -122,6 +122,7 @@ jobs:
           --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} \
           --dns-name-label devops-demo-staging-${{ github.run_number }} \
           --ports 5000 \
+          --os-type Linux \
           --registry-login-server ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io \
           --registry-username ${{ secrets.AZURE_CLIENT_ID }} \
           --registry-password ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -153,6 +154,7 @@ jobs:
           --image ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} \
           --dns-name-label devops-demo-prod \
           --ports 5000 \
+          --os-type Linux \
           --registry-login-server ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io \
           --registry-username ${{ secrets.AZURE_CLIENT_ID }} \
           --registry-password ${{ secrets.AZURE_CLIENT_SECRET }}
