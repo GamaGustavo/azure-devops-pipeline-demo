@@ -123,6 +123,8 @@ jobs:
           --dns-name-label devops-demo-staging-${{ github.run_number }} \
           --ports 5000 \
           --os-type Linux \
+          --cpu 0.5 \
+          --memory 1.5 \
           --registry-login-server ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io \
           --registry-username ${{ secrets.AZURE_CLIENT_ID }} \
           --registry-password ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -155,6 +157,8 @@ jobs:
           --dns-name-label devops-demo-prod \
           --ports 5000 \
           --os-type Linux \
+          --cpu 1.0 \
+          --memory 2.0 \
           --registry-login-server ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io \
           --registry-username ${{ secrets.AZURE_CLIENT_ID }} \
           --registry-password ${{ secrets.AZURE_CLIENT_SECRET }}
